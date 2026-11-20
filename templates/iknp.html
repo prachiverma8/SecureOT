@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IKNP OT Extension | SecureOT</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>IKNP OT Extension</h1>
+        <p>Privacy-preserving multiple message transfers</p>
+
+        <form method="POST">
+
+            {% for i in range(3) %}
+
+            <div class="card">
+
+                <h3>Message Pair {{ i + 1 }}</h3>
+
+                <label>Message 0</label>
+                <input type="text" name="message0" required placeholder="Enter first message">
+
+                <label>Message 1</label>
+                <input type="text" name="message1" required placeholder="Enter second message">
+
+                <label>Receiver's Choice</label>
+                <select name="choice" required>
+                    <option value="0">Select Message 0</option>
+                    <option value="1">Select Message 1</option>
+                </select>
+
+            </div>
+
+            {% endfor %}
+
+            <button type="submit">Execute IKNP Protocol</button>
+
+        </form>
+
+        {% if error %}
+            <div class="card">
+                <h3>Error</h3>
+                <p>{{ error }}</p>
+            </div>
+        {% endif %}
+
+        {% if result %}
+
+            <div class="card">
+                <h2>Transfer Successful!</h2>
+
+                <p>Base OTs: {{ result.base_ots }}</p>
+
+                <p>Extended OTs: {{ result.number_of_transfers }}</p>
+
+                <p>Execution Time: {{ result.execution_time_ms }} ms</p>
+
+                <h3>Received Messages</h3>
+
+                {% for message in result.received_messages %}
+                    <p>Transfer {{ loop.index }}: {{ message }}</p>
+                {% endfor %}
+
+            </div>
+
+        {% endif %}
+
+        <a href="/">Back to Home</a>
+
+    </div>
+
+</body>
+</html>
