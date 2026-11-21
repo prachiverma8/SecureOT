@@ -1,6 +1,7 @@
+from flask import Flask, render_template, request
+
 from performance import run_performance_test
 from iknp import iknp_ot_extension
-from flask import Flask, render_template, request
 
 from ot_protocol import (
     create_sender_offer,
@@ -9,8 +10,11 @@ from ot_protocol import (
     decrypt_selected_message
 )
 
+
 app = Flask(__name__)
 
+
+# Temporary storage for the Basic OT demonstration
 pending_transfer = {
     "message0": "",
     "message1": "",
@@ -19,10 +23,18 @@ pending_transfer = {
 }
 
 
+# --------------------------------------------------
+# HOME
+# --------------------------------------------------
+
 @app.route("/")
 def home():
     return render_template("index.html")
 
+
+# --------------------------------------------------
+# BASIC OT - SENDER
+# --------------------------------------------------
 
 @app.route("/sender", methods=["GET", "POST"])
 def sender():
@@ -36,20 +48,34 @@ def sender():
 
         if message0 and message1:
 
-            private_key, public_key = create_sender_offer()
+            try:
+                private_key, public_key = create_sender_offer()
 
-            pending_transfer["message0"] = message0
-            pending_transfer["message1"] = message1
-            pending_transfer["private_key"] = private_key
-            pending_transfer["public_key"] = public_key
+                pending_transfer["message0"] = message0
+                pending_transfer["message1"] = message1
+                pending_transfer["private_key"] = private_key
+                pending_transfer["public_key"] = public_key
 
-            status = "Messages prepared. DH public key generated successfully!"
+                status = (
+                    "Messages prepared. "
+                    "DH public key generated successfully!"
+                )
+
+            except Exception as e:
+                status = f"Error preparing messages: {str(e)}"
 
         else:
             status = "Please enter both messages."
 
-    return render_template("sender.html", status=status)
+    return render_template(
+        "sender.html",
+        status=status
+    )
 
+
+# --------------------------------------------------
+# BASIC OT - RECEIVER
+# --------------------------------------------------
 
 @app.route("/receiver", methods=["GET", "POST"])
 def receiver():
@@ -63,12 +89,18 @@ def receiver():
         choice = request.form.get("choice")
 
         if pending_transfer["private_key"] is None:
-            error = "No active transfer. Prepare messages in the Sender Dashboard first."
+
+            error = (
+                "No active transfer. "
+                "Prepare messages in the Sender Dashboard first."
+            )
 
         elif choice not in ["0", "1"]:
+
             error = "Please select a valid message."
 
         else:
+
             try:
                 choice_bit = int(choice)
 
@@ -78,7 +110,7 @@ def receiver():
                     choice_bit
                 )
 
-                # Sender encrypts both messages using derived keys
+                # Sender encrypts both messages
                 encrypted_data = encrypt_messages(
                     pending_transfer["private_key"],
                     pending_transfer["public_key"],
@@ -87,7 +119,7 @@ def receiver():
                     pending_transfer["message1"]
                 )
 
-                # Receiver decrypts only the selected ciphertext
+                # Receiver decrypts only the selected message
                 received_message = decrypt_selected_message(
                     receiver_private,
                     pending_transfer["public_key"],
@@ -106,23 +138,67 @@ def receiver():
     )
 
 
+# --------------------------------------------------
+# VISUALIZATION
+# --------------------------------------------------
+
 @app.route("/visualization")
 def visualization():
+
     return render_template("visualization.html")
+
+
+# --------------------------------------------------
+# IKNP OT EXTENSION
+# --------------------------------------------------
+
 @app.route("/iknp", methods=["GET", "POST"])
 def iknp():
+
     result = None
     error = None
 
     if request.method == "POST":
+
         try:
+            # Retrieve all submitted message pairs and choices
             message0 = request.form.getlist("message0")
             message1 = request.form.getlist("message1")
             choices = request.form.getlist("choice")
 
-            message_pairs = list(zip(message0, message1))
-            receiver_choices = [int(choice) for choice in choices]
+            # Validate the number of submitted inputs
+            if not (
+                len(message0) == len(message1) == len(choices) == 3
+            ):
+                raise ValueError(
+                    "Please provide all three message pairs and choices."
+                )
 
+            # Remove unnecessary whitespace
+            message0 = [message.strip() for message in message0]
+            message1 = [message.strip() for message in message1]
+
+            # Validate message fields
+            if any(not message for message in message0 + message1):
+                raise ValueError(
+                    "All message fields must be filled."
+                )
+
+            # Validate receiver choices
+            if any(choice not in ["0", "1"] for choice in choices):
+                raise ValueError(
+                    "Invalid receiver choice. Select 0 or 1."
+                )
+
+            # Prepare message pairs
+            message_pairs = list(zip(message0, message1))
+
+            # Convert choices into integer bits
+            receiver_choices = [
+                int(choice) for choice in choices
+            ]
+
+            # Execute IKNP OT Extension
             result = iknp_ot_extension(
                 message_pairs,
                 receiver_choices
@@ -137,6 +213,10 @@ def iknp():
         error=error
     )
 
+
+# --------------------------------------------------
+# PERFORMANCE TESTING
+# --------------------------------------------------
 
 @app.route("/performance")
 def performance():
@@ -157,5 +237,12 @@ def performance():
     )
 
 
+# --------------------------------------------------
+# APPLICATION ENTRY POINT
+# --------------------------------------------------
+
 if __name__ == "__main__":
-    app.run(debug=True)
+
+    app.run(
+        debug=True
+    )
