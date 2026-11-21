@@ -3,76 +3,776 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>IKNP OT Extension | SecureOT</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --background: #080e1c;
+            --surface: #101a2e;
+            --surface-light: #16243c;
+            --border: rgba(148, 163, 184, 0.16);
+            --text: #edf2ff;
+            --muted: #94a3b8;
+            --blue: #60a5fa;
+            --cyan: #2dd4bf;
+            --green: #34d399;
+            --red: #fb7185;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: 'DM Sans', sans-serif;
+            background:
+                radial-gradient(
+                    circle at 15% 5%,
+                    rgba(37, 99, 235, 0.16),
+                    transparent 32%
+                ),
+                radial-gradient(
+                    circle at 90% 90%,
+                    rgba(20, 184, 166, 0.10),
+                    transparent 30%
+                ),
+                var(--background);
+            color: var(--text);
+            padding: 30px 6%;
+        }
+
+        .container {
+            max-width: 1050px;
+            margin: auto;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 65px;
+        }
+
+        .brand {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 23px;
+            font-weight: 700;
+            letter-spacing: -0.8px;
+        }
+
+        .brand span {
+            color: var(--cyan);
+        }
+
+        .back-link {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s ease;
+        }
+
+        .back-link:hover {
+            color: var(--cyan);
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 38px;
+        }
+
+        .eyebrow {
+            display: inline-block;
+            color: var(--cyan);
+            background: rgba(45, 212, 191, 0.09);
+            border: 1px solid rgba(45, 212, 191, 0.2);
+            border-radius: 30px;
+            padding: 7px 15px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(32px, 5vw, 48px);
+            letter-spacing: -1.5px;
+            margin-bottom: 15px;
+        }
+
+        .hero p {
+            color: var(--muted);
+            max-width: 650px;
+            margin: auto;
+            line-height: 1.7;
+            font-size: 15px;
+        }
+
+        .info-chips {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .chip {
+            background: rgba(148, 163, 184, 0.07);
+            border: 1px solid var(--border);
+            color: #cbd5e1;
+            border-radius: 30px;
+            padding: 9px 14px;
+            font-size: 12px;
+        }
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 18px;
+        }
+
+        .section-heading h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 21px;
+        }
+
+        .section-heading p {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .transfer-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .transfer-card {
+            background: linear-gradient(
+                145deg,
+                rgba(22, 36, 60, 0.95),
+                rgba(16, 26, 46, 0.95)
+            );
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 21px;
+            transition: border-color 0.2s ease,
+                        transform 0.2s ease;
+        }
+
+        .transfer-card:hover {
+            border-color: rgba(96, 165, 250, 0.45);
+            transform: translateY(-3px);
+        }
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+        }
+
+        .card-number {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .card-status {
+            color: var(--muted);
+            font-size: 11px;
+            background: rgba(148, 163, 184, 0.1);
+            padding: 5px 9px;
+            border-radius: 20px;
+        }
+
+        .field {
+            margin-bottom: 17px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #cbd5e1;
+            margin-bottom: 8px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px 13px;
+            border-radius: 9px;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            background: rgba(8, 14, 28, 0.8);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s ease,
+                        box-shadow 0.2s ease;
+        }
+
+        input::placeholder {
+            color: #64748b;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        select option {
+            background: var(--surface);
+            color: var(--text);
+        }
+
+        .counter {
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 18px;
+        }
+
+        .counter strong {
+            color: var(--cyan);
+        }
+
+        .privacy-note {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            padding: 16px 18px;
+            margin-top: 24px;
+            background: rgba(45, 212, 191, 0.06);
+            border: 1px solid rgba(45, 212, 191, 0.15);
+            border-radius: 12px;
+        }
+
+        .privacy-icon {
+            color: var(--cyan);
+            font-size: 18px;
+        }
+
+        .privacy-note p {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .privacy-note strong {
+            color: #d1fae5;
+        }
+
+        .submit-area {
+            text-align: center;
+            margin-top: 28px;
+        }
+
+        .submit-btn {
+            border: none;
+            border-radius: 10px;
+            padding: 14px 30px;
+            background: linear-gradient(110deg, #2563eb, #0d9488);
+            color: white;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.2s ease,
+                        transform 0.2s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            opacity: 0.92;
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .submit-description {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 12px;
+        }
+
+        .message-box {
+            margin-top: 28px;
+            padding: 17px 20px;
+            border-radius: 12px;
+            line-height: 1.6;
+            font-size: 14px;
+            overflow-wrap: anywhere;
+        }
+
+        .error-box {
+            color: #fecdd3;
+            background: rgba(244, 63, 94, 0.09);
+            border: 1px solid rgba(244, 63, 94, 0.25);
+        }
+
+        .result-box {
+            background: rgba(16, 185, 129, 0.07);
+            border: 1px solid rgba(52, 211, 153, 0.23);
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 30px;
+        }
+
+        .result-heading {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 21px;
+            margin-bottom: 8px;
+            color: var(--green);
+        }
+
+        .result-description {
+            color: var(--muted);
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .result-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 23px;
+        }
+
+        .stat-card {
+            padding: 16px;
+            border-radius: 10px;
+            background: rgba(8, 14, 28, 0.55);
+            border: 1px solid var(--border);
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: 11px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 21px;
+            font-weight: 700;
+            overflow-wrap: anywhere;
+        }
+
+        .received-heading {
+            font-size: 15px;
+            margin-bottom: 13px;
+        }
+
+        .received-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .received-item {
+            padding: 14px;
+            background: rgba(8, 14, 28, 0.55);
+            border: 1px solid var(--border);
+            border-radius: 9px;
+        }
+
+        .received-label {
+            color: var(--cyan);
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 7px;
+        }
+
+        .received-message {
+            color: var(--text);
+            font-size: 13px;
+            overflow-wrap: anywhere;
+            white-space: pre-wrap;
+        }
+
+        .footer {
+            text-align: center;
+            color: #64748b;
+            font-size: 12px;
+            margin-top: 55px;
+            padding-bottom: 10px;
+        }
+
+        @media (max-width: 850px) {
+            .transfer-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 22px 5%;
+            }
+
+            .navbar {
+                margin-bottom: 45px;
+            }
+
+            .transfer-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-heading {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .result-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .submit-btn {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-    <div class="container">
+<div class="container">
+
+    <nav class="navbar">
+        <div class="brand">Secure<span>OT</span></div>
+
+        <a href="{{ url_for('home') }}" class="back-link">
+            ← Back to Home
+        </a>
+    </nav>
+
+
+    <header class="hero">
+
+        <div class="eyebrow">Privacy-Preserving Data Transfer</div>
 
         <h1>IKNP OT Extension</h1>
-        <p>Privacy-preserving multiple message transfers</p>
 
-        <form method="POST">
+        <p>
+            Demonstrate how Oblivious Transfer Extension supports
+            multiple private message selections using a smaller set
+            of initial base OTs and cryptographic expansion.
+        </p>
 
-            {% for i in range(3) %}
+        <div class="info-chips">
+            <span class="chip">128 Base OTs</span>
+            <span class="chip">SHAKE-256 Expansion</span>
+            <span class="chip">AES-GCM Encryption</span>
+            <span class="chip">3 Transfer Pairs</span>
+        </div>
 
-            <div class="card">
+    </header>
 
-                <h3>Message Pair {{ i + 1 }}</h3>
 
-                <label>Message 0</label>
-                <input type="text" name="message0" required placeholder="Enter first message">
+    <main>
 
-                <label>Message 1</label>
-                <input type="text" name="message1" required placeholder="Enter second message">
+        <form method="POST" id="iknpForm">
 
-                <label>Receiver's Choice</label>
-                <select name="choice" required>
-                    <option value="0">Select Message 0</option>
-                    <option value="1">Select Message 1</option>
-                </select>
+            <div class="section-heading">
+                <div>
+                    <h2>Configure Transfers</h2>
+                    <p>Enter two messages and a receiver choice for each pair.</p>
+                </div>
 
+                <p>Maximum: 3 pairs</p>
             </div>
 
-            {% endfor %}
 
-            <button type="submit">Execute IKNP Protocol</button>
+            <div class="transfer-grid">
 
-        </form>
+                {% for i in range(3) %}
 
-        {% if error %}
-            <div class="card">
-                <h3>Error</h3>
-                <p>{{ error }}</p>
-            </div>
-        {% endif %}
+                <section class="transfer-card">
 
-        {% if result %}
+                    <div class="card-top">
+                        <span class="card-number">
+                            Transfer Pair {{ i + 1 }}
+                        </span>
 
-            <div class="card">
-                <h2>Transfer Successful!</h2>
+                        <span class="card-status" id="status{{ i }}">
+                            Incomplete
+                        </span>
+                    </div>
 
-                <p>Base OTs: {{ result.base_ots }}</p>
 
-                <p>Extended OTs: {{ result.number_of_transfers }}</p>
+                    <div class="field">
+                        <label for="message0_{{ i }}">
+                            Message 0
+                        </label>
 
-                <p>Execution Time: {{ result.execution_time_ms }} ms</p>
+                        <input
+                            type="text"
+                            id="message0_{{ i }}"
+                            name="message0"
+                            placeholder="Enter first message"
+                            required
+                            autocomplete="off"
+                        >
+                    </div>
 
-                <h3>Received Messages</h3>
 
-                {% for message in result.received_messages %}
-                    <p>Transfer {{ loop.index }}: {{ message }}</p>
+                    <div class="field">
+                        <label for="message1_{{ i }}">
+                            Message 1
+                        </label>
+
+                        <input
+                            type="text"
+                            id="message1_{{ i }}"
+                            name="message1"
+                            placeholder="Enter second message"
+                            required
+                            autocomplete="off"
+                        >
+                    </div>
+
+
+                    <div class="field">
+                        <label for="choice_{{ i }}">
+                            Receiver's Choice
+                        </label>
+
+                        <select
+                            id="choice_{{ i }}"
+                            name="choice"
+                            required
+                        >
+                            <option value="0">
+                                0 — Select Message 0
+                            </option>
+
+                            <option value="1">
+                                1 — Select Message 1
+                            </option>
+                        </select>
+                    </div>
+
+                </section>
+
                 {% endfor %}
 
             </div>
 
+
+            <div class="counter" id="completedCount" aria-live="polite">
+                <strong>0 of 3</strong> message pairs completed
+            </div>
+
+
+            <div class="privacy-note">
+                <span class="privacy-icon">◆</span>
+
+                <p>
+                    <strong>About this demonstration</strong><br>
+                    The protocol demonstrates private message selection
+                    using an educational IKNP-style OT Extension
+                    implementation. The receiver's selected message
+                    is decrypted using the corresponding cryptographic key.
+                </p>
+            </div>
+
+
+            <div class="submit-area">
+
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    Run IKNP OT Extension →
+                </button>
+
+                <p class="submit-description" id="submitStatus">
+                    Submit all three pairs to execute the demonstration.
+                </p>
+
+            </div>
+
+        </form>
+
+
+        {% if error %}
+
+        <section class="message-box error-box" role="alert">
+            <strong>Something went wrong</strong><br>
+            {{ error }}
+        </section>
+
         {% endif %}
 
-        <a href="/">Back to Home</a>
 
-    </div>
+        {% if result %}
+
+        <section class="result-box" aria-live="polite">
+
+            <h2 class="result-heading">
+                ✓ Execution Completed
+            </h2>
+
+            <p class="result-description">
+                The IKNP OT Extension operation returned the following results.
+            </p>
+
+
+            <div class="result-stats">
+
+                <div class="stat-card">
+                    <div class="stat-label">Base OTs</div>
+
+                    <div class="stat-value">
+                        {{ result.base_ots }}
+                    </div>
+                </div>
+
+
+                <div class="stat-card">
+                    <div class="stat-label">Transfers Processed</div>
+
+                    <div class="stat-value">
+                        {{ result.number_of_transfers }}
+                    </div>
+                </div>
+
+
+                <div class="stat-card">
+                    <div class="stat-label">Execution Time</div>
+
+                    <div class="stat-value">
+                        {{ "%.2f"|format(result.execution_time_ms|float) }}
+                        <small style="font-size: 12px;">ms</small>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <h3 class="received-heading">
+                Received Messages
+            </h3>
+
+            <div class="received-list">
+
+                {% for message in result.received_messages %}
+
+                <div class="received-item">
+
+                    <div class="received-label">
+                        TRANSFER {{ loop.index }}
+                    </div>
+
+                    <div class="received-message">{{ message }}</div>
+
+                </div>
+
+                {% else %}
+
+                <div class="received-item">
+                    No received messages were returned.
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+        </section>
+
+        {% endif %}
+
+    </main>
+
+
+    <footer class="footer">
+        SecureOT · Privacy-Preserving Data Transfer Demonstration
+    </footer>
+
+</div>
+
+
+<script>
+    const form = document.getElementById("iknpForm");
+    const submitBtn = document.getElementById("submitBtn");
+    const submitStatus = document.getElementById("submitStatus");
+    const completedCount = document.getElementById("completedCount");
+
+    const totalPairs = 3;
+
+
+    function updateProgress() {
+
+        let completed = 0;
+
+        for (let i = 0; i < totalPairs; i++) {
+
+            const message0 = document.getElementById(`message0_${i}`);
+            const message1 = document.getElementById(`message1_${i}`);
+            const status = document.getElementById(`status${i}`);
+
+            const isComplete =
+                message0.value.trim() !== "" &&
+                message1.value.trim() !== "";
+
+            if (isComplete) {
+                completed++;
+
+                status.textContent = "Ready";
+                status.style.color = "#34d399";
+            } else {
+                status.textContent = "Incomplete";
+                status.style.color = "#94a3b8";
+            }
+        }
+
+        completedCount.innerHTML =
+            `<strong>${completed} of ${totalPairs}</strong> message pairs completed`;
+    }
+
+
+    for (let i = 0; i < totalPairs; i++) {
+
+        document
+            .getElementById(`message0_${i}`)
+            .addEventListener("input", updateProgress);
+
+        document
+            .getElementById(`message1_${i}`)
+            .addEventListener("input", updateProgress);
+    }
+
+
+    form.addEventListener("submit", function(event) {
+
+        if (!form.checkValidity()) {
+            return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Processing IKNP...";
+        submitStatus.textContent =
+            "Please wait while the cryptographic operation is running.";
+    });
+
+
+    updateProgress();
+</script>
 
 </body>
 </html>
